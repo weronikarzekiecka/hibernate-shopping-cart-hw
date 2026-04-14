@@ -1,5 +1,6 @@
 package mate.academy.dao.impl;
 
+import mate.academy.exception.DataProcessingException;
 import mate.academy.dao.TicketDao;
 import mate.academy.lib.Dao;
 import mate.academy.model.Ticket;
@@ -17,14 +18,14 @@ public class TicketDaoImpl implements TicketDao {
                 .getSessionFactory()
                 .openSession()) {
             transaction = session.beginTransaction();
-            session.persist(ticket);
+            session.save(ticket);
             transaction.commit();
             return ticket;
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            throw new RuntimeException(
+            throw new DataProcessingException(
                     "Can't insert ticket", e
             );
         }

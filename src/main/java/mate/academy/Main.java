@@ -14,17 +14,22 @@ import mate.academy.service.ShoppingCartService;
 import mate.academy.service.UserService;
 
 public class Main {
-    private static final Injector injector = Injector.getInstance("mate.academy");
+    private static final Injector injector =
+            Injector.getInstance("mate.academy");
 
     public static void main(String[] args) {
         MovieService movieService =
                 (MovieService) injector.getInstance(MovieService.class);
+
         CinemaHallService cinemaHallService =
                 (CinemaHallService) injector.getInstance(CinemaHallService.class);
+
         MovieSessionService movieSessionService =
                 (MovieSessionService) injector.getInstance(MovieSessionService.class);
+
         UserService userService =
                 (UserService) injector.getInstance(UserService.class);
+
         ShoppingCartService shoppingCartService =
                 (ShoppingCartService) injector.getInstance(ShoppingCartService.class);
 
@@ -44,7 +49,7 @@ public class Main {
         movieSessionService.add(movieSession);
 
         User user = new User();
-        user.setEmail("weronika" + System.currentTimeMillis() + "@cinema.com");
+        user.setEmail("test" + System.currentTimeMillis() + "@cinema.com");
         user.setPassword("1234");
         userService.add(user);
 
@@ -53,12 +58,9 @@ public class Main {
         shoppingCartService.addSession(movieSession, user);
 
         ShoppingCart cart = shoppingCartService.getByUser(user);
-        System.out.println("SHOPPING CART:");
         System.out.println(cart);
 
         shoppingCartService.clear(cart);
-
-        System.out.println("CART AFTER CLEAR:");
-        System.out.println(shoppingCartService.getByUser(user));
+        System.out.println("Cart cleared");
     }
 }
