@@ -12,8 +12,7 @@ import mate.academy.model.User;
 import mate.academy.service.ShoppingCartService;
 
 @Service
-public class ShoppingCartServiceImpl
-        implements ShoppingCartService {
+public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Inject
     private ShoppingCartDao shoppingCartDao;
 
@@ -21,35 +20,34 @@ public class ShoppingCartServiceImpl
     private TicketDao ticketDao;
 
     @Override
-    public void addSession(
-            MovieSession movieSession,
-            User user
-    ) {
-        ShoppingCart shoppingCart = getByUser(user);
+    public void addSession(MovieSession movieSession, User user) {
+        ShoppingCart shoppingCart = shoppingCartDao.getByUser(user)
+                .orElseThrow(() -> new RuntimeException(
+                        "Shopping cart not found for user: " + user.getEmail()));
 
         Ticket ticket = new Ticket();
         ticket.setMovieSession(movieSession);
+        ticket.setUser(user);
+        ticket.setShoppingCart(shoppingCart);
 
-        ticket = ticketDao.add(ticket);
+        ticketDao.add(ticket);
 
         shoppingCart.getTickets().add(ticket);
-
         shoppingCartDao.update(shoppingCart);
     }
 
     @Override
     public ShoppingCart getByUser(User user) {
         return shoppingCartDao.getByUser(user)
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Shopping cart not found"
-                        ));
+                .orElseThrow(() -> new RuntimeException(
+                        "Shopping cart not found for user: " + user.getEmail()));
     }
 
     @Override
     public void registerNewShoppingCart(User user) {
         ShoppingCart shoppingCart = new ShoppingCart();
         shoppingCart.setUser(user);
+        shoppingCart.setTickets(new ArrayList<>());
         shoppingCartDao.add(shoppingCart);
     }
 
