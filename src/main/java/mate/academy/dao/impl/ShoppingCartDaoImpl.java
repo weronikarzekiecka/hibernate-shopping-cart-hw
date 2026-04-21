@@ -8,18 +8,18 @@ import mate.academy.model.ShoppingCart;
 import mate.academy.model.User;
 import mate.academy.util.HibernateUtil;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 @Dao
 public class ShoppingCartDaoImpl implements ShoppingCartDao {
-    private final SessionFactory factory = HibernateUtil.getSessionFactory();
 
     @Override
     public ShoppingCart add(ShoppingCart shoppingCart) {
         Transaction transaction = null;
-        try (Session session = factory.openSession()) {
+        try (Session session = HibernateUtil
+                .getSessionFactory()
+                .openSession()) {
             transaction = session.beginTransaction();
             session.save(shoppingCart);
             transaction.commit();
@@ -29,40 +29,47 @@ public class ShoppingCartDaoImpl implements ShoppingCartDao {
                 transaction.rollback();
             }
             throw new DataProcessingException(
-                    "Can't insert shopping cart", e);
+                    "Can't add shopping cart: " + shoppingCart, e
+            );
         }
     }
 
     @Override
     public Optional<ShoppingCart> getByUser(User user) {
-        try (Session session = factory.openSession()) {
+        try (Session session = HibernateUtil
+                .getSessionFactory()
+                .openSession()) {
             Query<ShoppingCart> query = session.createQuery(
-                    "from ShoppingCart sc "
-                            + "left join fetch sc.tickets "
-                            + "where sc.user = :user",
+                    "FROM ShoppingCart sc "
+                            + "LEFT JOIN FETCH sc.tickets "
+                            + "WHERE sc.user = :user",
                     ShoppingCart.class
             );
             query.setParameter("user", user);
             return query.uniqueResultOptional();
         } catch (Exception e) {
             throw new DataProcessingException(
-                    "Can't get shopping cart by user: " + user.getId(), e);
+                    "Can't get shopping cart for user: " + user, e
+            );
         }
     }
 
     @Override
     public void update(ShoppingCart shoppingCart) {
         Transaction transaction = null;
-        try (Session session = factory.openSession()) {
+        try (Session session = HibernateUtil
+                .getSessionFactory()
+                .openSession()) {
             transaction = session.beginTransaction();
-            session.update(shoppingCart);
+            session.merge(shoppingCart);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
             throw new DataProcessingException(
-                    "Can't update shopping cart", e);
+                    "Can't update shopping cart: " + shoppingCart, e
+            );
         }
     }
 }

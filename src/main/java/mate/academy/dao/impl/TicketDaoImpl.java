@@ -1,7 +1,7 @@
 package mate.academy.dao.impl;
 
-import mate.academy.exception.DataProcessingException;
 import mate.academy.dao.TicketDao;
+import mate.academy.exception.DataProcessingException;
 import mate.academy.lib.Dao;
 import mate.academy.model.Ticket;
 import mate.academy.util.HibernateUtil;
@@ -13,7 +13,6 @@ public class TicketDaoImpl implements TicketDao {
     @Override
     public Ticket add(Ticket ticket) {
         Transaction transaction = null;
-
         try (Session session = HibernateUtil
                 .getSessionFactory()
                 .openSession()) {
@@ -26,7 +25,7 @@ public class TicketDaoImpl implements TicketDao {
                 transaction.rollback();
             }
             throw new DataProcessingException(
-                    "Can't insert ticket", e
+                    "Can't insert ticket: " + ticket, e
             );
         }
     }

@@ -1,15 +1,17 @@
 package mate.academy.model;
 
+import java.util.ArrayList;
+import java.util.List;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "shopping_carts")
@@ -17,31 +19,39 @@ public class ShoppingCart {
     @Id
     private Long id;
 
-    @MapsId
     @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "shopping_cart_tickets",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "ticket_id")
+    )
     private List<Ticket> tickets = new ArrayList<>();
+
+    public ShoppingCart() {
+    }
 
     public Long getId() {
         return id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public List<Ticket> getTickets() {
         return tickets;
     }
 
+    public User getUser() {
+        return user;
+    }
+
     public void setTickets(List<Ticket> tickets) {
         this.tickets = tickets;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
